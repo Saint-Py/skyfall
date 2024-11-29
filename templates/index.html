@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyfall Game</title>
+</head>
+<body>
+    <h1>Welcome to the Skyfall Game</h1>
+
+    <h2>Create a Room</h2>
+    <form id="create-room-form">
+        <label for="room_id">Room ID:</label>
+        <input type="text" id="room_id" name="room_id" required>
+        <button type="submit">Create Room</button>
+    </form>
+
+    <h2>Join a Room</h2>
+    <form id="join-room-form">
+        <label for="player_name">Your Name:</label>
+        <input type="text" id="player_name" name="player_name" required>
+        <label for="join_room_id">Room ID:</label>
+        <input type="text" id="join_room_id" name="join_room_id" required>
+        <button type="submit">Join Room</button>
+    </form>
+
+    <h2>Room List</h2>
+    <button onclick="getRooms()">Get All Rooms</button>
+    <div id="room-list"></div>
+
+    <script>
+        async function getRooms() {
+            const response = await fetch('/get-rooms');
+            const data = await response.json();
+            document.getElementById('room-list').innerText = JSON.stringify(data.rooms, null, 2);
+        }
+
+        document.getElementById('create-room-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const roomId = document.getElementById('room_id').value;
+            const response = await fetch('/create-room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ room_id: roomId }),
+            });
+            alert((await response.json()).message);
+        });
+
+        document.getElementById('join-room-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const playerName = document.getElementById('player_name').value;
+            const roomId = document.getElementById('join_room_id').value;
+            const response = await fetch(`/join-room/${roomId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player_name: playerName }),
+            });
+            alert((await response.json()).message);
+        });
+    </script>
+</body>
+</html>
